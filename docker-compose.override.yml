@@ -3,7 +3,7 @@ services:
   traefik:
     build:
       context: "./docker/traefik"
-    container_name: lfm-traefik
+    container_name: ${APP_CODE_CONTAINER_PREFIX}-traefik
 
     command:
       - "--providers.docker"

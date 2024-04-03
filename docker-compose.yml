@@ -4,7 +4,7 @@ services:
     nginx:
         build:
             context: "./docker/nginx"
-        container_name: lfm-nginx
+        container_name: ${APP_CODE_CONTAINER_PREFIX}-nginx
         restart: always
         depends_on:
             - php-fpm
@@ -16,7 +16,7 @@ services:
     php-fpm:
         build:
             context: "./docker/php-fpm"
-        container_name: lfm-php-fpm
+        container_name: ${APP_CODE_CONTAINER_PREFIX}-php-fpm
         restart: always
         volumes:
             - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
@@ -28,7 +28,7 @@ services:
     mysql:
         build:
             context: "./docker/mysql"
-        container_name: lfm-mysql
+        container_name: ${APP_CODE_CONTAINER_PREFIX}-mysql
         environment:
             - MYSQL_DATABASE=${DB_DATABASE}
             - MYSQL_USER=${DB_USERNAME}
