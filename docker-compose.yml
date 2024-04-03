@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+    nginx:
+        build:
+            context: "./docker/nginx"
+        container_name: lfm-nginx
+        restart: always
+        depends_on:
+            - php-fpm
+        volumes:
+            - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
+        networks:
+            - backend
+
+    php-fpm:
+        build:
+            context: "./docker/php-fpm"
+        container_name: lfm-php-fpm
+        restart: always
+        volumes:
+            - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
+        networks:
+            - backend
+        expose:
+            - "9000"
+
+    mysql:
+        build:
+            context: "./docker/mysql"
+        container_name: lfm-mysql
+        environment:
+            - MYSQL_DATABASE=${DB_DATABASE}
+            - MYSQL_USER=${DB_USERNAME}
+            - MYSQL_PASSWORD=${DB_PASSWORD}
+            - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+        volumes:
+            - ./docker/mysql/data:/var/lib/mysql
+        ports:
+            - ${DB_PORT}:3306
+        networks:
+            - backend
+
+networks:
+    backend:
+        driver: bridge

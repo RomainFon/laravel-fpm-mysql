@@ -1,0 +1,51 @@
+version: '3'
+services:
+  traefik:
+    build:
+      context: "./docker/traefik"
+    container_name: lfm-traefik
+
+    command:
+      - "--providers.docker"
+      - "--providers.docker.exposedByDefault=false"
+
+      # entrypoints
+      - "--entrypoints.web.address=:80"
+
+      # Enable Traefik dashboard
+      - "--api.dashboard=true"
+
+      # Enable Logging
+      - "--log.level=DEBUG"
+      - "--log.filePath=/logs/traefik/traefik.log"
+
+      # Enable Access logging
+      - "--accesslog=false"
+      - "--accesslog.filePath=/logs/traefik/access.log"
+      - "--accesslog.bufferingsize=50" # reduced amount of writes to the filesystem
+
+    ports:
+      - 80:80
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=lfm-traefik_backend"
+
+      - "traefik.http.routers.traefik.rule=Host(`traefik.localhost`)"
+      - "traefik.http.routers.traefik.service=api@internal"
+
+    environment:
+      - TZ=Europe/Paris
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./docker/logs/traefik/:/logs/
+
+    networks:
+      - backend
+
+  nginx:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=lfm-traefik_backend"
+      - "traefik.http.routers.nginx.rule=Host(`localhost`)"
